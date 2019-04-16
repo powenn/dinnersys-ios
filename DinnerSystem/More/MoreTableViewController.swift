@@ -137,16 +137,16 @@ class MoreTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.row == 1{
-            if counter == 13{
-                counter = 0
-                self.performSegue(withIdentifier: "bonusSegue", sender: self)
-            }else{
-                counter += 1
-                self.performSegue(withIdentifier: "normalSegue", sender: self)
-            }
-        }
-        else if indexPath.row == 2{
+//        if indexPath.row == 1{
+//            if counter == 13{
+//                counter = 0
+//                self.performSegue(withIdentifier: "bonusSegue", sender: self)
+//            }else{
+//                counter += 1
+//                self.performSegue(withIdentifier: "normalSegue", sender: self)
+//            }
+//        }else
+        if indexPath.row == 2{
             do{
                 let cardResponse = try Data(contentsOf: URL(string: dsURL("get_pos"))!)
                 POSInfo = try decoder.decode(CardInfo.self, from: cardResponse)

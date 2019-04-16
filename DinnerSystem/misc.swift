@@ -12,11 +12,11 @@ import Alamofire
 let decoder = JSONDecoder()
 let versionNumber = 201900012
 func dsURL(_ cmd: String) -> String{
-    return "https://dinnersystem.com/dinnersys_beta/backend/backend.php?cmd=\(cmd)"
+    return "https://\(dsIP)/dinnersys_beta/backend/backend.php?cmd=\(cmd)"
 }
 let itmsURL = URL(string: "itms-apps://itunes.apple.com/app/id1352943874")!
-let dinnersysURL = "https://dinnersystem.com/dinnersys_beta/"
-
+let dinnersysURL = "https://\(dsIP)/dinnersys_beta/"
+var dsIP = "dinnersystem.com"
 struct SelectedFood {
     static var name: String = ""
     static var id: String = ""
@@ -49,7 +49,7 @@ struct loginInfo{
 */
 
 func logout(){
-    Alamofire.request("https://dinnersystem.com/dinnersys_beta/backend/backend.php?cmd=logout").responseData{_ in}
+    Alamofire.request("https://\(dsIP)/dinnersys_beta/backend/backend.php?cmd=logout").responseData{_ in}
 }
 
 struct Ord{

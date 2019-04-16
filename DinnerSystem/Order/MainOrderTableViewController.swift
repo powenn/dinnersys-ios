@@ -10,14 +10,15 @@ import UIKit
 import Alamofire
 import TrueTime
 import Crashlytics
+import FirebaseMessaging
 
 class MainOrderTableViewController: UITableViewController {
-    
+    var uDefault: UserDefaults!
     var activityIndicator = UIActivityIndicatorView()
     var indicatorBackView = UIView()
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        uDefault = UserDefaults.standard
         
         activityIndicator.center = self.view.center
         activityIndicator.hidesWhenStopped = true
@@ -31,6 +32,17 @@ class MainOrderTableViewController: UITableViewController {
         self.view.addSubview(indicatorBackView)
         self.view.addSubview(activityIndicator)
         
+        if usr == "06610233"{                                   //daily order notification
+            if !uDefault.bool(forKey: "isSubbed"){
+                Messaging.messaging().subscribe(toTopic: "com.dinnersystem.dailyNotification"){ error in
+                    if error != nil{
+                        self.present(createAlert("哎呀呀", "我出了一點問題，快截圖傳給開發人員！\n\(error!)"), animated: true, completion: nil)
+                    }else{
+                        self.present(createAlert("安安", "每日通知已開啟喔"), animated: true, completion: nil)
+                        self.uDefault.set(true, forKey: "isSubbed")}
+                }
+            }
+        }
         
         fetchData()
         
@@ -80,6 +92,9 @@ class MainOrderTableViewController: UITableViewController {
                             if food.isIdle! == "1"{
                                 mainMenuArr.remove(at: foodCount)
                             }else{
+                                if Int(food.remaining!)! == Int32.max{
+                                    mainMenuArr[foodCount].remaining = "1000"
+                                }
                                 foodCount += 1
                             }
                         }
@@ -92,36 +107,6 @@ class MainOrderTableViewController: UITableViewController {
                                 cafetMenuArr.append(food)
                             }else if food.department?.factory?.name! == "關東煮"{
                                 guanDonMenuArr.append(food)
-                            }
-                        }
-                        for i in 0..<guanDonMenuArr.count{
-                            /*
-                            Alamofire.request("\(dsURL("get_remaining"))&id=\(guanDonMenuArr[i].dishId!)").responseString{ remainResponse in
-                                if remainResponse.error != nil {
-                                    let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
-                                    errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
-                                        (action: UIAlertAction!) -> () in
-                                        logout()
-                                        self.dismiss(animated: true, completion: nil)
-                                    }))
-                                    self.present(errorAlert, animated: true, completion: nil)
-                                }else{
-                                    guanDonMenuArr[i] = try! decoder.decode(Menu.self, from: remainResponse.data!)
-                                }
-                            }
-                            */
-                            do{
-                                let remainResponse = try Data(contentsOf: URL(string: "\(dsURL("get_remaining"))&id=\(guanDonMenuArr[i].dishId!)")!)
-                                guanDonMenuArr[i] = try decoder.decode(Menu.self, from: remainResponse)
-                            }catch let responseError{
-                                Crashlytics.sharedInstance().recordError(responseError)
-                                let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
-                                errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
-                                    (action: UIAlertAction!) -> () in
-                                    logout()
-                                    self.dismiss(animated: true, completion: nil)
-                                }))
-                                self.present(errorAlert, animated: true, completion: nil)
                             }
                         }
                     }catch let error{
@@ -138,30 +123,15 @@ class MainOrderTableViewController: UITableViewController {
                 }
                 
             }
-            /*
-            Alamofire.request(dsURL("get_money")).responseString{ response in
-                if response.error != nil && response.result.value!.contains("timeout") {
-                    let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
-                    errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
-                        (action: UIAlertAction!) -> () in
-                        logout()
-                        self.dismiss(animated: true, completion: nil)
-                    }))
-                    self.present(errorAlert, animated: true, completion: nil)
-                }else{
-                    print(response.result.value!)
-                    let string = response.result.value!.trimmingCharacters(in: .whitespacesAndNewlines)
-                    balance = Int(string)!
-                }
-            }
-            */
             do{
-                let balanceRepsonse = try String(contentsOf: URL(string: dsURL("get_money"))!)
-                if balanceRepsonse.isInt {
-                    balance = Int(balanceRepsonse)!
-                }else{
-                    print(balanceRepsonse)
-                    let alert = UIAlertController(title: "請重新登入", message: "讀取餘額失敗，請再試一次，若反覆出現請通知開發人員！", preferredStyle: UIAlertController.Style.alert)
+                let balanceRepsonse = try Data(contentsOf: URL(string: dsURL("get_pos"))!)
+                do{
+                    POSInfo = try decoder.decode(CardInfo.self, from: balanceRepsonse)
+                    balance = Int(POSInfo.money!)!
+                }catch let error{
+                    Crashlytics.sharedInstance().recordError(error)
+                    print(String(data: balanceRepsonse, encoding: .utf8)!)
+                    let alert = UIAlertController(title: "請重新登入", message: "查詢餘額失敗，我們已經派出最精銳的猴子去修理這個問題，若長時間出現此問題請通知開發人員！", preferredStyle: UIAlertController.Style.alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
                         (action: UIAlertAction!) -> () in
                         logout()
@@ -171,6 +141,7 @@ class MainOrderTableViewController: UITableViewController {
                 }
             }catch let error{
                 Crashlytics.sharedInstance().recordError(error)
+                print(error)
                 let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
                 errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
                     (action: UIAlertAction!) -> () in

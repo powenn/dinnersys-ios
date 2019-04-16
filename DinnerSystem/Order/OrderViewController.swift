@@ -18,11 +18,11 @@ class orderViewController: UIViewController, UITableViewDelegate, UITableViewDat
     @IBOutlet var nameView: UITableView!
     @IBOutlet var qtyView: UITableView!
     @IBOutlet var costView: UITableView!
-    var foodArray: [selectedFoodArray] = []
+    var foodArray: [SelectedFoodArray] = []
     override func viewDidLoad() {
         foodArray.removeAll()
-        foodArray.append(selectedFoodArray(name: selectedFood.name, qty: "x1", cost: selectedFood.cost))
-        foodArray.append(selectedFoodArray(name: "小計", qty: "x1", cost: selectedFood.cost))
+        foodArray.append(SelectedFoodArray(name: SelectedFood.name, qty: "x1", cost: SelectedFood.cost))
+        foodArray.append(SelectedFoodArray(name: "小計", qty: "x1", cost: SelectedFood.cost))
     }
     
     //MARK: - tableView
@@ -92,17 +92,17 @@ class orderViewController: UIViewController, UITableViewDelegate, UITableViewDat
         
         //time lock
         let calander = Calendar.current
-        let lower_bound = calander.date(bySettingHour: 10, minute: 0, second: 0, of: date)
+        let lower_bound = calander.date(bySettingHour: 10, minute: 10, second: 0, of: date)
         //end
         if date > lower_bound! {
-            let alert = UIAlertController(title: "超過訂餐時間", message: "早上十點後無法訂餐，明日請早", preferredStyle: .alert)
+            let alert = UIAlertController(title: "超過訂餐時間", message: "早上十點十分後無法訂餐，明日請早", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
                 (action: UIAlertAction!) -> () in
                 self.navigationController?.popViewController(animated: true)
             }))
             self.present(alert, animated: true)
         }else{
-            Alamofire.request("\(dsURL("make_self_order"))&dish_id[]=\(selectedFood.id)&time=\(currentDate)-12:00:00").responseData{response in
+            Alamofire.request("\(dsURL("make_self_order"))&dish_id[]=\(SelectedFood.id)&time=\(currentDate)-12:00:00").responseData{response in
                 if response.error != nil {
                     let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
                     errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
@@ -139,7 +139,7 @@ class orderViewController: UIViewController, UITableViewDelegate, UITableViewDat
                 let result = orderResult
                 switch result {
                 case "DTError":
-                    let alert = UIAlertController(title: "時間/日期發生錯誤", message: "請確認您手機的日期正確，或嘗試重新開啟程式，若持續發生問題，請通知開發人員！", preferredStyle: .alert)
+                    let alert = UIAlertController(title: "時間/日期發生錯誤", message: "請不要在00:00-04:00之間點餐，或請確認您手機的日期正確，或嘗試重新開啟程式，若持續發生問題，請通知開發人員！", preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                     self.present(alert, animated: true)
                 case "Logout":

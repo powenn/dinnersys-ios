@@ -54,48 +54,81 @@ class LoginViewController: UIViewController {
         }else{
             print("token:"+fcmToken)
         }
+        
+        /*
+         Alamofire.request("\(dinnersysURL)frontend/u_move_u_dead/version.txt").responseString{ response in
+         if response.error != nil {
+         self.indicatorBackView.isHidden = true
+         self.activityIndicator.stopAnimating()
+         UIApplication.shared.endIgnoringInteractionEvents()
+         Crashlytics.sharedInstance().recordError(response.error!)
+         let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.\n\(response.error!)", preferredStyle: .alert)
+         errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+         self.present(errorAlert, animated: true, completion: nil)
+         }else{
+         let decoder = JSONDecoder()
+         print(String(data: response.data!, encoding: .utf8)!)
+         do{
+         currentVersion = try decoder.decode(appVersion.self, from: response.data!)
+         if !(currentVersion.ios!.contains(versionNumber)){
+         let alert = UIAlertController(title: "偵測到更新版本", message: "請至App Store更新最新版本的點餐系統!", preferredStyle: .alert)
+         let action = UIAlertAction(title: "OK(跳轉至AppStore)", style: .default, handler: {
+         (action: UIAlertAction!) -> () in
+         UIApplication.shared.openURL(itmsURL)
+         })
+         alert.addAction(action)
+         self.present(alert, animated: true, completion: nil)
+         }
+         }catch let error{
+         print(error)
+         let alert = UIAlertController(title: "Oops", message: "發生了不知名的錯誤，請聯繫開發人員", preferredStyle: .alert)
+         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+         Crashlytics.sharedInstance().recordError(error)
+         self.present(alert,animated: true, completion: nil)
+         
+         }
+         
+         self.indicatorBackView.isHidden = true
+         self.activityIndicator.stopAnimating()
+         UIApplication.shared.endIgnoringInteractionEvents()
+         }
+         }
+         */
+        
+    }
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(true)
         UIApplication.shared.beginIgnoringInteractionEvents()
         self.activityIndicator.startAnimating()
         self.indicatorBackView.isHidden = false
-        Alamofire.request("\(dinnersysURL)frontend/u_move_u_dead/version.txt").responseString{ response in
-            if response.error != nil {
-                self.indicatorBackView.isHidden = true
-                self.activityIndicator.stopAnimating()
-                UIApplication.shared.endIgnoringInteractionEvents()
-                Crashlytics.sharedInstance().recordError(response.error!)
-                let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.\n\(response.error!)", preferredStyle: .alert)
-                errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                self.present(errorAlert, animated: true, completion: nil)
-            }else{
-                let decoder = JSONDecoder()
-                print(String(data: response.data!, encoding: .utf8)!)
-                do{
-                    currentVersion = try decoder.decode(appVersion.self, from: response.data!)
-                    if !(currentVersion.ios!.contains(versionNumber)){
-                        let alert = UIAlertController(title: "偵測到更新版本", message: "請至App Store更新最新版本的點餐系統!", preferredStyle: .alert)
-                        let action = UIAlertAction(title: "OK(跳轉至AppStore)", style: .default, handler: {
-                            (action: UIAlertAction!) -> () in
-                            UIApplication.shared.openURL(itmsURL)
-                        })
-                        alert.addAction(action)
-                        self.present(alert, animated: true, completion: nil)
-                    }
-                }catch let error{
-                    print(error)
-                    let alert = UIAlertController(title: "Oops", message: "發生了不知名的錯誤，請聯繫開發人員", preferredStyle: .alert)
-                    alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
-                    Crashlytics.sharedInstance().recordError(error)
-                    self.present(alert,animated: true, completion: nil)
-                    
-                }
-                
-                self.indicatorBackView.isHidden = true
-                self.activityIndicator.stopAnimating()
-                UIApplication.shared.endIgnoringInteractionEvents()
+        do{
+            let versionURL = URL(string: "\(dinnersysURL)frontend/u_move_u_dead/version.txt")!
+            let versionResponse = try Data(contentsOf: versionURL)
+            print(String(data: versionResponse, encoding: .utf8)!)
+            currentVersion = try decoder.decode(AppVersion.self, from: versionResponse)
+            if !(currentVersion.ios!.contains(versionNumber)){
+                let alert = UIAlertController(title: "偵測到更新版本", message: "請至App Store更新最新版本的點餐系統!", preferredStyle: .alert)
+                let action = UIAlertAction(title: "OK(跳轉至AppStore)", style: .default, handler: {
+                    (action: UIAlertAction!) -> () in
+                    UIApplication.shared.open(itmsURL, options: [:], completionHandler: nil)
+                })
+                alert.addAction(action)
+                self.present(alert, animated: true, completion: nil)
             }
+            self.indicatorBackView.isHidden = true
+            self.activityIndicator.stopAnimating()
+            UIApplication.shared.endIgnoringInteractionEvents()
+        }catch let error{
+            print(error)
+            self.indicatorBackView.isHidden = true
+            self.activityIndicator.stopAnimating()
+            UIApplication.shared.endIgnoringInteractionEvents()
+            let alert = UIAlertController(title: "Oops", message: "發生了不知名的錯誤，請聯繫開發人員", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
+            Crashlytics.sharedInstance().recordError(error)
+            self.present(alert,animated: true, completion: nil)
         }
     }
-    
     // MARK: - quitKeyboard
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         username.resignFirstResponder()
@@ -111,7 +144,7 @@ class LoginViewController: UIViewController {
         let timeStamp = String(Int(Date().timeIntervalSince1970))
         let reach = Reachability()!
         //MARK: - hash
-        let hash = "{\"id\":\"\(usr)\",\"password\":\"\(pwd)\",\"time\":\"\(timeStamp)\"}".sha512()
+        let _ = "{\"id\":\"\(usr)\",\"password\":\"\(pwd)\",\"time\":\"\(timeStamp)\"}".sha512()  //hash
         if(reach.connection == .none){                      //no Internet
             let alert = UIAlertController(title: "無網路連接", message: "請注意網路連接是否正常", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
@@ -120,7 +153,8 @@ class LoginViewController: UIViewController {
             UIApplication.shared.beginIgnoringInteractionEvents()
             self.activityIndicator.startAnimating()
             self.indicatorBackView.isHidden = false
-            Alamofire.request("\(dsURL("login"))&id=\(usr)&hash=\(hash)&time=\(timeStamp)&device_id=\(fcmToken)").responseData{response in
+            print("\(dsURL("login"))&id=\(usr)&password=\(pwd)&time=\(timeStamp)&device_id=HELLO_FROM_IOS")
+            Alamofire.request("\(dsURL("login"))&id=\(usr)&password=\(pwd)&time=\(timeStamp)&device_id=HELLO_FROM_IOS").responseData{response in
                 if response.error != nil {
                     self.indicatorBackView.isHidden = true
                     self.activityIndicator.stopAnimating()
@@ -132,7 +166,7 @@ class LoginViewController: UIViewController {
                 }else{
                     let string = String(data: response.data!, encoding: .utf8)!
                     Crashlytics.sharedInstance().setObjectValue(string, forKey: "httpResponse")
-                    if (string.contains("無法登入。")) || (string.contains("No")) || (string.contains("Invalid") || (string == "") || (string == "Wrong") || (string == "punish") || (string == "Punish") || (usr.count != 8) && (usr != "seanpai")){
+                    if (string.contains("無法登入。")) || (string.contains("No")) || (string.contains("Invalid") || (string == "") || (string == "Wrong") || (string == "punish") || (string == "Punish") || (usr.count == 5)){
                         let alert = UIAlertController(title: "無法登入", message: "請確認帳號密碼是否錯誤。", preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                         self.present(alert, animated: true, completion: nil)
@@ -174,7 +208,7 @@ class LoginViewController: UIViewController {
         print(timeStamp)
         let reach = Reachability()!
         //MARK: - hash
-        let hash = "{\"id\":\"\(usr)\",\"password\":\"\(pwd)\",\"time\":\"\(timeStamp)\"}".sha512()
+        let _ = "{\"id\":\"\(usr)\",\"password\":\"\(pwd)\",\"time\":\"\(timeStamp)\"}".sha512() //hash
         print(hash)
         if(reach.connection == .none){                      //no Internet
             let alert = UIAlertController(title: "無網路連接", message: "請注意網路連接是否正常", preferredStyle: .alert)
@@ -184,7 +218,8 @@ class LoginViewController: UIViewController {
             UIApplication.shared.beginIgnoringInteractionEvents()
             self.activityIndicator.startAnimating()
             self.indicatorBackView.isHidden = false
-            Alamofire.request("\(dsURL("login"))&id=\(usr)&hash=\(hash)&time=\(timeStamp)&device_id=\(fcmToken)").responseData{response in
+            print("\(dsURL("login"))&id=\(usr)&password=\(pwd)&time=\(timeStamp)&device_id=HELLO_FROM_IOS")
+            Alamofire.request("\(dsURL("login"))&id=\(usr)&password=\(pwd)&time=\(timeStamp)&device_id=HELLO_FROM_IOS").responseData{response in
                 if response.error != nil {
                     Crashlytics.sharedInstance().recordError(response.error!)
                     self.indicatorBackView.isHidden = true
@@ -197,7 +232,7 @@ class LoginViewController: UIViewController {
                     Crashlytics.sharedInstance().setObjectValue(String(data: response.data!, encoding: .utf8), forKey: "httpResponse")
                     let string = String(data: response.data!, encoding: .utf8)!
                     print(string)
-                    if (string.contains("無法登入。")) || (string.contains("No")) || (string.contains("Invalid") || (string == "") || (string == "Wrong") || (usr.count != 8) && (usr != "seanpai")){
+                    if (string.contains("無法登入。")) || (string.contains("No")) || (string.contains("Invalid") || (string == "") || (string == "Wrong") || (usr.count == 5)){
                         let alert = UIAlertController(title: "無法登入", message: "請確認帳號密碼是否錯誤。", preferredStyle: .alert)
                         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                         self.present(alert, animated: true, completion: nil)

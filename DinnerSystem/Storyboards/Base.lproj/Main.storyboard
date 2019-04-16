@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14460.31" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="f9G-Zk-c4b">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="f9G-Zk-c4b">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14460.20"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -849,6 +849,23 @@
                                             </subviews>
                                         </tableViewCellContentView>
                                     </tableViewCell>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" textLabel="TNr-lB-0L7" style="IBUITableViewCellStyleDefault" id="AnJ-Vo-jie">
+                                        <rect key="frame" x="0.0" y="88" width="375" height="44"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="AnJ-Vo-jie" id="yAA-sA-IdH">
+                                            <rect key="frame" x="0.0" y="0.0" width="341" height="43.5"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" insetsLayoutMarginsFromSafeArea="NO" text="顯示付款條碼" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="TNr-lB-0L7">
+                                                    <rect key="frame" x="16" y="0.0" width="324" height="43.5"/>
+                                                    <autoresizingMask key="autoresizingMask"/>
+                                                    <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                                    <nil key="textColor"/>
+                                                    <nil key="highlightedColor"/>
+                                                </label>
+                                            </subviews>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
                                 </cells>
                             </tableViewSection>
                         </sections>
@@ -872,6 +889,7 @@
                     <connections>
                         <segue destination="IkS-Bw-cts" kind="show" identifier="bonusSegue" id="eT9-At-rTt"/>
                         <segue destination="kjd-uX-HoU" kind="show" identifier="normalSegue" id="gbe-0n-KgB"/>
+                        <segue destination="L8j-jM-Rdj" kind="show" identifier="barcodeSegue" id="9VN-b4-HtG"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Vb3-9i-tHd" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -947,6 +965,45 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Hsk-qA-Ixc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="193" y="3962"/>
+        </scene>
+        <!--Barcode View Controller-->
+        <scene sceneID="l6L-Ji-6yB">
+            <objects>
+                <viewController id="L8j-jM-Rdj" customClass="BarcodeViewController" customModule="DinnerSystem" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="WFG-PB-CjQ">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="KAI" translatesAutoresizingMaskIntoConstraints="NO" id="7aQ-Z1-QNh">
+                                <rect key="frame" x="72" y="224" width="231" height="219"/>
+                            </imageView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Coming Soon!!!! :)))" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UXc-SD-FeU">
+                                <rect key="frame" x="35" y="111" width="150" height="20.5"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="h9C-Cr-fNC" firstAttribute="bottom" secondItem="7aQ-Z1-QNh" secondAttribute="bottom" constant="175" id="68Q-hh-zo2"/>
+                            <constraint firstItem="h9C-Cr-fNC" firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="UXc-SD-FeU" secondAttribute="trailing" symbolic="YES" id="SQV-An-nZN"/>
+                            <constraint firstItem="UXc-SD-FeU" firstAttribute="top" secondItem="h9C-Cr-fNC" secondAttribute="top" constant="47" id="Z9I-WH-eLl"/>
+                            <constraint firstItem="7aQ-Z1-QNh" firstAttribute="centerX" secondItem="WFG-PB-CjQ" secondAttribute="centerX" id="gz5-Jh-omS"/>
+                            <constraint firstItem="7aQ-Z1-QNh" firstAttribute="centerY" secondItem="WFG-PB-CjQ" secondAttribute="centerY" id="iLl-0J-C2t"/>
+                            <constraint firstItem="7aQ-Z1-QNh" firstAttribute="leading" secondItem="h9C-Cr-fNC" secondAttribute="leading" constant="72" id="j6y-mm-hqO"/>
+                            <constraint firstItem="UXc-SD-FeU" firstAttribute="leading" secondItem="h9C-Cr-fNC" secondAttribute="leading" constant="35" id="oZb-56-xyo"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="h9C-Cr-fNC"/>
+                    </view>
+                    <connections>
+                        <outlet property="barcodeImage" destination="7aQ-Z1-QNh" id="hOV-6i-3vm"/>
+                        <outlet property="infoText" destination="UXc-SD-FeU" id="TVl-wU-vmp"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="aJU-jB-EyH" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="981.60000000000002" y="3960.2698650674665"/>
         </scene>
         <!--Tab Bar Controller-->
         <scene sceneID="Swu-kw-n7m">
@@ -1070,7 +1127,7 @@
                                     <action selector="sendOrder:" destination="9NA-bb-m3u" eventType="touchUpInside" id="Aoc-Aw-MX9"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="超過十點後無法點餐，請注意時間！ 請選擇取餐時間後，按下訂餐。" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="Zjl-Dn-zCI">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="請於取餐時間兩個小時前訂餐！ 選擇取餐時間後，再按下訂餐。" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" minimumFontSize="9" translatesAutoresizingMaskIntoConstraints="NO" id="Zjl-Dn-zCI">
                                 <rect key="frame" x="16" y="424" width="333" height="41"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
@@ -1134,12 +1191,13 @@
         </scene>
     </scenes>
     <resources>
-        <image name="Image" width="414" height="623"/>
-        <image name="bg_2" width="259.20001220703125" height="460.79998779296875"/>
+        <image name="Image" width="1725" height="2596"/>
+        <image name="KAI" width="410" height="410"/>
+        <image name="bg_2" width="1080" height="1920"/>
         <image name="confirmButton" width="568" height="129"/>
-        <image name="menu" width="25.600000381469727" height="25.600000381469727"/>
-        <image name="more" width="25.600000381469727" height="25.600000381469727"/>
-        <image name="ordering" width="25.600000381469727" height="25.600000381469727"/>
+        <image name="menu" width="32" height="32"/>
+        <image name="more" width="32" height="32"/>
+        <image name="ordering" width="32" height="32"/>
     </resources>
     <inferredMetricsTieBreakers>
         <segue reference="D6C-QK-Xqt"/>

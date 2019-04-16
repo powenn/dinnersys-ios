@@ -25,13 +25,14 @@ class HistoryTableViewController: UITableViewController {
         print(today)
         historyTableList = []
         do{
-            let balanceRepsonse = try String(contentsOf: URL(string: dsURL("get_money"))!)
-            if balanceRepsonse.isInt {
-                balance = Int(balanceRepsonse)!
-                self.navigationItem.title = "檢視今日訂單" + "（餘額: \(balance)）"
-            }else{
-                print(balanceRepsonse)
-                let alert = UIAlertController(title: "請重新登入", message: "讀取餘額失敗，請再試一次，若反覆出現請通知開發人員！", preferredStyle: UIAlertController.Style.alert)
+            let balanceRepsonse = try Data(contentsOf: URL(string: dsURL("get_pos"))!)
+            do{
+                POSInfo = try decoder.decode(CardInfo.self, from: balanceRepsonse)
+                balance = Int(POSInfo.money!)!
+            }catch let error{
+                Crashlytics.sharedInstance().recordError(error)
+                print(String(data: balanceRepsonse, encoding: .utf8)!)
+                let alert = UIAlertController(title: "請重新登入", message: "查詢餘額失敗，我們已經派出最精銳的猴子去修理這個問題，若長時間出現此問題請通知開發人員！", preferredStyle: UIAlertController.Style.alert)
                 alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
                     (action: UIAlertAction!) -> () in
                     logout()
@@ -40,6 +41,7 @@ class HistoryTableViewController: UITableViewController {
                 self.present(alert, animated: true, completion: nil)
             }
         }catch let error{
+            Crashlytics.sharedInstance().recordError(error)
             print(error)
             let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
             errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
@@ -189,9 +191,11 @@ class HistoryTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         var info = historyTableList[indexPath.row]
         info.recvDate = String(info.recvDate!.dropLast(3))
+        let timeBool = info.recvDate!.contains("11:00")
         let paid:Bool = info.money!.payment![0].paid! == "true" ? true : false
+        let timeAlertString = timeBool ? "請於上午九點半前付款！" : "請於上午十點半前付款！"
         let alert = UIAlertController(title: "訂餐編號：\(info.id!)\n餐點內容：\(info.dishName!)\n訂餐日期：\(info.recvDate!)\n餐點金額：\(info.money!.charge!)$\n付款狀態：\(paid ? "已付款" : "未付款")\n",
-            message: "付款請於上午十點半前付款！",
+            message: timeAlertString,
             preferredStyle: .actionSheet)
         let paidAction = UIAlertAction(title: "已付款者請聯絡合作社取消", style: .default, handler: nil)
         paidAction.isEnabled = false
@@ -243,7 +247,7 @@ class HistoryTableViewController: UITableViewController {
         let paymentAction = UIAlertAction(title: "以學生證付款(餘額：\(balance))", style: .default, handler: {(action: UIAlertAction!) -> () in
             
             self.tableView.isUserInteractionEnabled = false                 //prevent from bugging
-            var hash = ""
+            var _ = ""  //hash
             var payment_pw = ""
             var timeStamp = String(Int(Date().timeIntervalSince1970))
             let pwAttempt = UIAlertController(title: "請輸入繳款密碼", message: "預設為身分證字號後四碼", preferredStyle: .alert)
@@ -253,11 +257,15 @@ class HistoryTableViewController: UITableViewController {
                 self.activityIndicator.startAnimating()
                 self.indicatorBackView.isHidden = false
                 //time
+                
                 let date = Date()
                 let calander = Calendar.current
-                let lower_bound = calander.date(bySettingHour: 10, minute: 30, second: 0, of: date)
-                if date > lower_bound!{
-                    let alert = UIAlertController(title: "超過付款時間", message: "早上十點半後無法付款，明日請早", preferredStyle: .alert)
+                let lower_bound_12 = calander.date(bySettingHour: 10, minute: 30, second: 0, of: date)
+                let lower_bound_11 = calander.date(bySettingHour: 9, minute: 30, second: 0, of: date)
+                if ((timeBool && date > lower_bound_11!) || (!timeBool && date > lower_bound_12!)){
+                //if(false){
+                    let alertStr = timeBool ? "早上九點半後無法付款，明日請早" : "早上十點半後無法付款，明日請早"
+                    let alert = UIAlertController(title: "超過付款時間", message: alertStr, preferredStyle: .alert)
                     alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
                         (action: UIAlertAction!) -> () in
                         self.navigationController?.popViewController(animated: true)
@@ -273,8 +281,8 @@ class HistoryTableViewController: UITableViewController {
                     paymentTextFields.keyboardType = UIKeyboardType.numberPad
                     timeStamp = String(Int(Date().timeIntervalSince1970))
                     payment_pw = paymentTextFields.text!
-                    hash = "{\"id\":\"\(info.id!)\",\"usr_id\":\"\(usr)\",\"usr_password\":\"\(pwd)\",\"pmt_password\":\"\(payment_pw)\",\"time\":\"\(timeStamp)\"}".sha512()
-                    Alamofire.request("\(dsURL("payment_self"))&target=true&order_id=\(info.id!)&hash=\(hash)").responseData{ response in
+                    _ = "{\"id\":\"\(info.id!)\",\"usr_id\":\"\(usr)\",\"usr_password\":\"\(pwd)\",\"pmt_password\":\"\(payment_pw)\",\"time\":\"\(timeStamp)\"}".sha512()   //if lrc made this available again i will kill him :)
+                    Alamofire.request("\(dsURL("payment_self"))&target=true&order_id=\(info.id!)&password=\(payment_pw)").responseData{ response in
                         if response.error != nil {              //internetErr
                             let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
                             errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
@@ -313,7 +321,7 @@ class HistoryTableViewController: UITableViewController {
                             let errorAlert = UIAlertController(title: "Error", message: "您輸入錯誤太多次，請稍候(約六十秒後)再試。", preferredStyle: .alert)
                             errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                             self.present(errorAlert, animated: true, completion: nil)
-                        }else if responseStr.contains("Unable"){                //too many times
+                        }else if responseStr.contains("Unable") || responseStr.contains("dead") ||  responseStr.contains("expired"){                //too many times
                             let errorAlert = UIAlertController(title: "Error", message: "未成功付款，請聯絡開發人員", preferredStyle: .alert)
                             errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: nil))
                             self.present(errorAlert, animated: true, completion: nil)
@@ -322,12 +330,14 @@ class HistoryTableViewController: UITableViewController {
                                 _ = try JSONSerialization.jsonObject(with: response.data!)
                                 let oldBalance = balance
                                 do{
-                                    let balanceRepsonse = try String(contentsOf: URL(string: dsURL("get_money"))!)
-                                    if balanceRepsonse.isInt {
-                                        balance = Int(balanceRepsonse)!
-                                    }else{
-                                        print(balanceRepsonse)
-                                        let alert = UIAlertController(title: "請重新登入", message: "讀取餘額失敗，請再試一次，若反覆出現請通知開發人員！", preferredStyle: UIAlertController.Style.alert)
+                                    let balanceRepsonse = try Data(contentsOf: URL(string: dsURL("get_pos"))!)
+                                    do{
+                                        POSInfo = try decoder.decode(CardInfo.self, from: balanceRepsonse)
+                                        balance = Int(POSInfo.money!)!
+                                    }catch let error{
+                                        Crashlytics.sharedInstance().recordError(error)
+                                        print(String(data: balanceRepsonse, encoding: .utf8)!)
+                                        let alert = UIAlertController(title: "請重新登入", message: "查詢餘額失敗，我們已經派出最精銳的猴子去修理這個問題，若長時間出現此問題請通知開發人員！", preferredStyle: UIAlertController.Style.alert)
                                         alert.addAction(UIAlertAction(title: "OK", style: .default, handler: {
                                             (action: UIAlertAction!) -> () in
                                             logout()
@@ -389,6 +399,7 @@ class HistoryTableViewController: UITableViewController {
         let brokeAction = UIAlertAction(title: "餘額不足(您只剩\(balance)元)", style: .default, handler: nil)
         brokeAction.isEnabled = false
         brokeAction.setValue(UIColor.gray, forKey: "titleTextColor")
+        
         alert.addAction(cancelAction)
         if paid {
             alert.addAction(paidAction)

@@ -102,7 +102,7 @@ class orderViewController: UIViewController, UITableViewDelegate, UITableViewDat
             }))
             self.present(alert, animated: true)
         }else{
-            Alamofire.request("\(dsURL("make_self_order"))&dish_id[]=\(SelectedFood.id)&time=\(currentDate)-12:00:00").responseData{response in
+            Alamofire.request("\(dsURL("make_self_order"))&dish_id[]=\(SelectedFood.id)&time=\(currentDate)-23:59:59").responseData{response in
                 if response.error != nil {
                     let errorAlert = UIAlertController(title: "Bad Internet.", message: "Please check your internet connection and retry.", preferredStyle: .alert)
                     errorAlert.addAction(UIAlertAction(title: "OK", style: .default, handler: {

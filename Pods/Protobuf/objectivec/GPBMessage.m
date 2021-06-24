@@ -79,10 +79,17 @@ static NSString *const kGPBDataCoderKey = @"GPBData";
   GPBFieldDescriptor *autocreatorField_;
   GPBExtensionDescriptor *autocreatorExtension_;
 
+<<<<<<< Updated upstream
   // A lock to provide mutual exclusion from internal data that can be modified
   // by *read* operations such as getters (autocreation of message fields and
   // message extensions, not setting of values). Used to guarantee thread safety
   // for concurrent reads on the message.
+=======
+  // Message can only be mutated from one thread. But some *readonly* operations
+  // modify internal state because they autocreate things. The
+  // autocreatedExtensionMap_ is one such structure. Access during readonly
+  // operations is protected via this semaphore.
+>>>>>>> Stashed changes
   // NOTE: OSSpinLock may seem like a good fit here but Apple engineers have
   // pointed out that they are vulnerable to live locking on iOS in cases of
   // priority inversion:

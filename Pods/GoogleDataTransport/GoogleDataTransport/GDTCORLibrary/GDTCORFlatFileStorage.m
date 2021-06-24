@@ -208,7 +208,38 @@
   });
 }
 
+<<<<<<< Updated upstream
 #pragma mark - GDTCORStorageProtocol
+=======
+- (void)batchIDsForTarget:(GDTCORTarget)target
+               onComplete:(nonnull void (^)(NSSet<NSNumber *> *_Nullable))onComplete {
+  dispatch_async(_storageQueue, ^{
+    NSFileManager *fileManager = [NSFileManager defaultManager];
+    NSError *error;
+    NSArray<NSString *> *batchPaths =
+        [fileManager contentsOfDirectoryAtPath:[GDTCORFlatFileStorage batchDataStoragePath]
+                                         error:&error];
+    if (error || batchPaths.count == 0) {
+      if (onComplete) {
+        onComplete(nil);
+      }
+      return;
+    }
+    NSMutableSet<NSNumber *> *batchIDs = [[NSMutableSet alloc] init];
+    for (NSString *path in batchPaths) {
+      NSDictionary<NSString *, id> *components = [self batchComponentsFromFilename:path];
+      NSNumber *targetNumber = components[kGDTCORBatchComponentsTargetKey];
+      NSNumber *batchID = components[kGDTCORBatchComponentsBatchIDKey];
+      if (batchID != nil && targetNumber.intValue == target) {
+        [batchIDs addObject:batchID];
+      }
+    }
+    if (onComplete) {
+      onComplete(batchIDs);
+    }
+  });
+}
+>>>>>>> Stashed changes
 
 - (void)libraryDataForKey:(nonnull NSString *)key
                onComplete:
@@ -267,6 +298,7 @@
  * @param eventHash The hash value of the event.
  * @return The filename
  */
+<<<<<<< Updated upstream
 - (NSURL *)saveEventBytesToDisk:(GDTCOREvent *)event
                       eventHash:(NSUInteger)eventHash
                           error:(NSError **)error {
@@ -275,10 +307,24 @@
   [event writeToGDTPath:eventFileName error:&writingError];
   if (writingError) {
     GDTCORLogDebug(@"There was an error saving an event to disk: %@", writingError);
+=======
+- (nullable NSArray<NSString *> *)batchDirPathsForBatchID:(NSNumber *)batchID
+                                                    error:(NSError **_Nonnull)outError {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+  NSError *error;
+  NSArray<NSString *> *batches =
+      [fileManager contentsOfDirectoryAtPath:[GDTCORFlatFileStorage batchDataStoragePath]
+                                       error:&error];
+  if (batches == nil) {
+    *outError = error;
+    GDTCORLogDebug(@"Failed to find event file paths for batchID: %@, error: %@", batchID, error);
+    return nil;
+>>>>>>> Stashed changes
   }
   return event.fileURL;
 }
 
+<<<<<<< Updated upstream
 /** Adds the event to internal tracking collections.
  *
  * @note This method should only be called from a method within a block on _storageQueue to maintain
@@ -293,6 +339,161 @@
   events = events ? events : [[NSMutableSet alloc] init];
   [events addObject:event];
   _targetToEventSet[target] = events;
+=======
+/** Makes a copy of the contents of a directory to a directory at the specified path.*/
+- (BOOL)moveContentsOfDirectoryAtPath:(NSString *)sourcePath
+                                   to:(NSString *)destinationPath
+                                error:(NSError **_Nonnull)outError {
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+
+  NSError *error;
+  NSArray<NSString *> *contentsPaths = [fileManager contentsOfDirectoryAtPath:sourcePath
+                                                                        error:&error];
+  if (contentsPaths == nil) {
+    *outError = error;
+    return NO;
+  }
+
+  NSMutableArray<NSError *> *errors = [NSMutableArray array];
+  for (NSString *path in contentsPaths) {
+    NSString *contentDestinationPath = [destinationPath stringByAppendingPathComponent:path];
+    NSString *contentSourcePath = [sourcePath stringByAppendingPathComponent:path];
+
+    NSError *moveError;
+    if (![fileManager moveItemAtPath:contentSourcePath
+                              toPath:contentDestinationPath
+                               error:&moveError] &&
+        moveError) {
+      [errors addObject:moveError];
+    }
+  }
+
+  if (errors.count == 0) {
+    return YES;
+  } else {
+    NSError *combinedError = [NSError errorWithDomain:@"GDTCORFlatFileStorage"
+                                                 code:-1
+                                             userInfo:@{NSUnderlyingErrorKey : errors}];
+    *outError = combinedError;
+    return NO;
+  }
+}
+
+- (void)syncThreadUnsafeRemoveBatchWithID:(nonnull NSNumber *)batchID
+                             deleteEvents:(BOOL)deleteEvents {
+  NSError *error;
+  NSArray<NSString *> *batchDirPaths = [self batchDirPathsForBatchID:batchID error:&error];
+
+  if (batchDirPaths == nil) {
+    return;
+  }
+
+  NSFileManager *fileManager = [NSFileManager defaultManager];
+
+  void (^removeBatchDir)(NSString *batchDirPath) = ^(NSString *batchDirPath) {
+    NSError *error;
+    if ([fileManager removeItemAtPath:batchDirPath error:&error]) {
+      GDTCORLogDebug(@"Batch removed at path: %@", batchDirPath);
+    } else {
+      GDTCORLogDebug(@"Failed to remove batch at path: %@", batchDirPath);
+    }
+  };
+
+  for (NSString *batchDirPath in batchDirPaths) {
+    @autoreleasepool {
+      if (deleteEvents) {
+        removeBatchDir(batchDirPath);
+      } else {
+        NSString *batchDirName = [batchDirPath lastPathComponent];
+        NSDictionary<NSString *, id> *components = [self batchComponentsFromFilename:batchDirName];
+        NSString *targetValue = [components[kGDTCORBatchComponentsTargetKey] stringValue];
+        NSString *destinationPath;
+        if (targetValue) {
+          destinationPath = [[GDTCORFlatFileStorage eventDataStoragePath]
+              stringByAppendingPathComponent:targetValue];
+        }
+
+        // `- [NSFileManager moveItemAtPath:toPath:error:]` method fails if an item by the
+        // destination path already exists (which usually is the case for the current method). Move
+        // the events one by one instead.
+        if (destinationPath && [self moveContentsOfDirectoryAtPath:batchDirPath
+                                                                to:destinationPath
+                                                             error:&error]) {
+          GDTCORLogDebug(@"Batched events at path: %@ moved back to the storage: %@", batchDirPath,
+                         destinationPath);
+        } else {
+          GDTCORLogDebug(@"Error encountered whilst moving events back: %@", error);
+        }
+
+        // Even if not all events where moved back to the storage, there is not much can be done at
+        // this point, so cleanup batch directory now to avoid cluttering.
+        removeBatchDir(batchDirPath);
+      }
+    }
+  }
+
+  [self.sizeTracker resetCachedSize];
+}
+
+#pragma mark - Private helper methods
+
++ (NSString *)eventDataStoragePath {
+  static NSString *eventDataPath;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    eventDataPath = [NSString stringWithFormat:@"%@/%@/gdt_event_data", GDTCORRootDirectory().path,
+                                               NSStringFromClass([self class])];
+  });
+  NSError *error;
+  [[NSFileManager defaultManager] createDirectoryAtPath:eventDataPath
+                            withIntermediateDirectories:YES
+                                             attributes:0
+                                                  error:&error];
+  GDTCORAssert(error == nil, @"Creating the library data path failed: %@", error);
+  return eventDataPath;
+}
+
++ (NSString *)batchDataStoragePath {
+  static NSString *batchDataPath;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    batchDataPath = [NSString stringWithFormat:@"%@/%@/gdt_batch_data", GDTCORRootDirectory().path,
+                                               NSStringFromClass([self class])];
+  });
+  NSError *error;
+  [[NSFileManager defaultManager] createDirectoryAtPath:batchDataPath
+                            withIntermediateDirectories:YES
+                                             attributes:0
+                                                  error:&error];
+  GDTCORAssert(error == nil, @"Creating the batch data path failed: %@", error);
+  return batchDataPath;
+}
+
++ (NSString *)libraryDataStoragePath {
+  static NSString *libraryDataPath;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    libraryDataPath =
+        [NSString stringWithFormat:@"%@/%@/gdt_library_data", GDTCORRootDirectory().path,
+                                   NSStringFromClass([self class])];
+  });
+  NSError *error;
+  [[NSFileManager defaultManager] createDirectoryAtPath:libraryDataPath
+                            withIntermediateDirectories:YES
+                                             attributes:0
+                                                  error:&error];
+  GDTCORAssert(error == nil, @"Creating the library data path failed: %@", error);
+  return libraryDataPath;
+}
+
++ (NSString *)batchPathForTarget:(GDTCORTarget)target
+                         batchID:(NSNumber *)batchID
+                  expirationDate:(NSDate *)expirationDate {
+  return
+      [NSString stringWithFormat:@"%@/%ld%@%@%@%llu", [GDTCORFlatFileStorage batchDataStoragePath],
+                                 (long)target, kMetadataSeparator, batchID, kMetadataSeparator,
+                                 ((uint64_t)expirationDate.timeIntervalSince1970)];
+>>>>>>> Stashed changes
 }
 
 #pragma mark - GDTCORLifecycleProtocol

@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 [![Version](https://img.shields.io/cocoapods/v/Firebase.svg?style=flat)](https://cocoapods.org/pods/Firebase)
 [![License](https://img.shields.io/cocoapods/l/Firebase.svg?style=flat)](https://cocoapods.org/pods/Firebase)
 [![Platform](https://img.shields.io/cocoapods/p/Firebase.svg?style=flat)](https://cocoapods.org/pods/Firebase)
@@ -90,13 +91,123 @@ Instructions for installing binary frameworks via
 [Rome](https://github.com/CocoaPods/Rome) are at [Rome](Rome.md).
 
 ### Using Firebase from a Framework or a library
+=======
+[![Version](https://img.shields.io/cocoapods/v/GoogleDataTransport.svg?style=flat)](https://cocoapods.org/pods/GoogleDataTransport)
+[![License](https://img.shields.io/cocoapods/l/GoogleDataTransport.svg?style=flat)](https://cocoapods.org/pods/GoogleDataTransport)
+[![Platform](https://img.shields.io/cocoapods/p/GoogleDataTransport.svg?style=flat)](https://cocoapods.org/pods/GoogleDataTransport)
 
-[Using Firebase from a Framework or a library](docs/firebase_in_libraries.md)
+[![Actions Status][gh-datatransport-badge]][gh-actions]
+>>>>>>> Stashed changes
+
+# GoogleDataTransport
+
+This library is for internal Google use only. It allows the logging of data and
+telemetry from Google SDKs.
+
+## Integration Testing
+These instructions apply to minor and patch version updates. Major versions need
+a customized adaptation.
+
+After the CI is green:
+* Update the version in the podspec to match the latest entry in the [CHANGELOG.md](CHANGELOG.md)
+* Checkout the `main` branch and ensure it is up to date.
+  ```console
+  git checkout main
+  git pull
+  ```
+* Add the CocoaPods tag (`{version}` will be the latest version in the [podspec](GoogleDataTransport.podspec#L3))
+  ```console
+  git tag CocoaPods-{version}
+  git push origin CocoaPods-{version}
+  ```
+* Push the podspec to the designated repo
+  * If this version of GDT is intended to launch **before or with** the next Firebase release:
+    <details>
+    <summary>Push to <b>SpecsStaging</b></summary>
+
+    ```console
+    pod repo push --skip-tests staging GoogleDataTransport.podspec
+    ```
+
+    If the command fails with `Unable to find the 'staging' repo.`, add the staging repo with:
+    ```console
+    pod repo add staging git@github.com:firebase/SpecsStaging.git
+    ```
+    </details>
+  * Otherwise:
+    <details>
+    <summary>Push to <b>SpecsDev</b></summary>
+
+    ```console
+    pod repo push --skip-tests dev GoogleDataTransport.podspec
+    ```
+
+    If the command fails with `Unable to find the 'dev' repo.`, add the dev repo with:
+    ```console
+    pod repo add dev git@github.com:firebase/SpecsDev.git
+    ```
+    </details>
+* Run Firebase CI by waiting until next nightly or adding a PR that touches `Gemfile`.
+* On google3, create a workspace and new CL. Then copybara and run a global TAP.
+  <pre>
+  /google/data/ro/teams/copybara/copybara third_party/firebase/ios/Releases/GoogleDataTransport/copy.bara.sky \
+  --piper-description-behavior=OVERWRITE \
+  --destination-cl=<b>YOUR_CL</b> gdt
+  </pre>
+
+## Publishing
+  * Add a version tag for Swift PM
+    * `git tag {version}`
+    * `git push origin {version}`
+  * `pod trunk push GoogleDataTransport.podspec`
+  * Clean up SpecsStaging
+
+## Set logging level
+
+### Swift
+
+- Import `GoogleDataTransport` module:
+    ```swift
+    import GoogleDataTransport
+    ```
+- Set logging level global variable to the desired value before calling `FirebaseApp.config()`:
+    ```swift
+    GDTCORConsoleLoggerLoggingLevel = GDTCORLoggingLevel.debug.rawValue
+    ```
+### Objective-C
+
+- Import `GoogleDataTransport`:
+    ```objective-c
+    #import <GoogleDataTransport/GoogleDataTransport.h>
+    ```
+- Set logging level global variable to the desired value before calling `-[FIRApp config]`:
+    ```objective-c
+    GDTCORConsoleLoggerLoggingLevel = GDTCORLoggingLevelDebug;
+    ```
+
+## Prereqs
+
+- `gem install --user cocoapods cocoapods-generate`
+- `brew install protobuf nanopb-generator`
+- `easy_install --user protobuf`
+
+## To develop
+
+- Run `./GoogleDataTransport/generate_project.sh` after installing the prereqs
+
+## When adding new logging endpoint
+
+- Use commands similar to:
+    - `python -c "line='https://www.firebase.com'; print line[0::2]" `
+    - `python -c "line='https://www.firebase.com'; print line[1::2]" `
+
+## When adding internal code that shouldn't be easily usable on github
+
+- Consider using go/copybara-library/scrubbing#cc_scrub
 
 ## Development
 
-To develop Firebase software in this repository, ensure that you have at least
-the following software:
+Ensure that you have at least the following software:
 
   * Xcode 10.1 (or later)
   * CocoaPods 1.7.2 (or later)
@@ -104,7 +215,7 @@ the following software:
 
 For the pod that you want to develop:
 
-`pod gen Firebase{name here}.podspec --local-sources=./ --auto-open --platforms=ios`
+`pod gen GoogleDataTransport.podspec --local-sources=./ --auto-open --platforms=ios`
 
 Note: If the CocoaPods cache is out of date, you may need to run
 `pod repo update` before the `pod gen` command.
@@ -113,11 +224,8 @@ Note: Set the `--platforms` option to `macos` or `tvos` to develop/test for
 those platforms. Since 10.2, Xcode does not properly handle multi-platform
 CocoaPods workspaces.
 
-Firestore has a self contained Xcode project. See
-[Firestore/README.md](Firestore/README.md).
-
 ### Development for Catalyst
-* `pod gen {name here}.podspec --local-sources=./ --auto-open --platforms=ios`
+* `pod gen GoogleDataTransport.podspec --local-sources=./ --auto-open --platforms=ios`
 * Check the Mac box in the App-iOS Build Settings
 * Sign the App in the Settings Signing & Capabilities tab
 * Click Pods in the Project Manager
@@ -125,9 +233,17 @@ Firestore has a self contained Xcode project. See
 * Select the Unit-unit scheme
 * Run it to build and test
 
+<<<<<<< Updated upstream
 ### Adding a New Firebase Pod
 
 See [AddNewPod.md](AddNewPod.md).
+=======
+Alternatively disable signing in each target:
+* Go to Build Settings tab
+* Click `+`
+* Select `Add User-Defined Setting`
+* Add `CODE_SIGNING_REQUIRED` setting with a value of `NO`
+>>>>>>> Stashed changes
 
 ### Code Formatting
 
@@ -139,9 +255,15 @@ Travis will verify that any code changes are done in a style compliant way. Inst
 `clang-format` and `swiftformat`.
 These commands will get the right versions:
 
+<<<<<<< Updated upstream
 ```
 brew upgrade https://raw.githubusercontent.com/Homebrew/homebrew-core/c6f1cbd/Formula/clang-format.rb
 brew upgrade https://raw.githubusercontent.com/Homebrew/homebrew-core/c13eda8/Formula/swiftformat.rb
+=======
+```console
+brew install clang-format@12
+brew install mint
+>>>>>>> Stashed changes
 ```
 
 Note: if you already have a newer version of these installed you may need to
@@ -155,6 +277,7 @@ match the versions in the CI failure logs
 
 Select a scheme and press Command-u to build a component and run its unit tests.
 
+<<<<<<< Updated upstream
 #### Viewing Code Coverage (Deprecated)
 
 First, make sure that [xcov](https://github.com/nakiostudio/xcov) is installed with `gem install xcov`.
@@ -274,6 +397,8 @@ to Build Settings.
 See [Roadmap](ROADMAP.md) for more about the Firebase iOS SDK Open Source
 plans and directions.
 
+=======
+>>>>>>> Stashed changes
 ## Contributing
 
 See [Contributing](CONTRIBUTING.md) for more information on contributing to the Firebase
@@ -284,10 +409,8 @@ iOS SDK.
 The contents of this repository is licensed under the
 [Apache License, version 2.0](http://www.apache.org/licenses/LICENSE-2.0).
 
-Your use of Firebase is governed by the
-[Terms of Service for Firebase Services](https://firebase.google.com/terms/).
-
 [gh-actions]: https://github.com/firebase/firebase-ios-sdk/actions
+<<<<<<< Updated upstream
 [gh-abtesting-badge]: https://github.com/firebase/firebase-ios-sdk/workflows/abtesting/badge.svg
 [gh-auth-badge]: https://github.com/firebase/firebase-ios-sdk/workflows/auth/badge.svg
 [gh-core-badge]: https://github.com/firebase/firebase-ios-sdk/workflows/core/badge.svg
@@ -305,3 +428,6 @@ Your use of Firebase is governed by the
 [gh-storage-badge]: https://github.com/firebase/firebase-ios-sdk/workflows/storage/badge.svg
 [gh-symbolcollision-badge]: https://github.com/firebase/firebase-ios-sdk/workflows/symbolcollision/badge.svg
 [gh-zip-badge]: https://github.com/firebase/firebase-ios-sdk/workflows/zip/badge.svg
+=======
+[gh-datatransport-badge]: https://github.com/firebase/firebase-ios-sdk/workflows/datatransport/badge.svg
+>>>>>>> Stashed changes

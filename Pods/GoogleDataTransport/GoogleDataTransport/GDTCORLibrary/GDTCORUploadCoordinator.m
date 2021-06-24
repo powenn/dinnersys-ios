@@ -64,10 +64,25 @@
  */
 - (void)startTimer {
   dispatch_async(_coordinationQueue, ^{
+<<<<<<< Updated upstream
     self->_timer =
         dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self->_coordinationQueue);
     dispatch_source_set_timer(self->_timer, DISPATCH_TIME_NOW, self->_timerInterval,
                               self->_timerLeeway);
+=======
+    if (self->_timer) {
+      // The timer has been already started.
+      return;
+    }
+
+    // Delay the timer slightly so it doesn't run while +load calls are still running.
+    dispatch_time_t deadline = dispatch_time(DISPATCH_TIME_NOW, 1 * NSEC_PER_SEC / 2);
+
+    self->_timer =
+        dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, self->_coordinationQueue);
+    dispatch_source_set_timer(self->_timer, deadline, self->_timerInterval, self->_timerLeeway);
+
+>>>>>>> Stashed changes
     dispatch_source_set_event_handler(self->_timer, ^{
       if (![[GDTCORApplication sharedApplication] isRunningInBackground]) {
         GDTCORUploadConditions conditions = [self uploadConditions];

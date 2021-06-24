@@ -22,6 +22,17 @@
     #import <FirebaseAnalytics/FirebaseAnalytics.h>
   #endif
 
+<<<<<<< Updated upstream
+=======
+  #if __has_include(<FirebaseAppCheck/FirebaseAppCheck.h>)
+    #import <FirebaseAppCheck/FirebaseAppCheck.h>
+  #endif
+
+  #if __has_include(<FirebaseAppDistribution/FirebaseAppDistribution.h>)
+    #import <FirebaseAppDistribution/FirebaseAppDistribution.h>
+  #endif
+
+>>>>>>> Stashed changes
   #if __has_include(<FirebaseAuth/FirebaseAuth.h>)
     #import <FirebaseAuth/FirebaseAuth.h>
   #endif
@@ -36,6 +47,7 @@
 
   #if __has_include(<FirebaseDynamicLinks/FirebaseDynamicLinks.h>)
     #import <FirebaseDynamicLinks/FirebaseDynamicLinks.h>
+<<<<<<< Updated upstream
     #if !__has_include(<FirebaseAnalytics/FirebaseAnalytics.h>)
       #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
         #warning "FirebaseAnalytics.framework is not included in your target. Please add \
@@ -43,6 +55,8 @@
 Firebase Dynamic Links works as intended."
       #endif // #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
     #endif
+=======
+>>>>>>> Stashed changes
   #endif
 
   #if __has_include(<FirebaseFirestore/FirebaseFirestore.h>)
@@ -55,6 +69,7 @@ Firebase Dynamic Links works as intended."
 
   #if __has_include(<FirebaseInAppMessaging/FirebaseInAppMessaging.h>)
     #import <FirebaseInAppMessaging/FirebaseInAppMessaging.h>
+<<<<<<< Updated upstream
     #if !__has_include(<FirebaseAnalytics/FirebaseAnalytics.h>)
       #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
         #warning "FirebaseAnalytics.framework is not included in your target. Please add \
@@ -66,10 +81,17 @@ Firebase In App Messaging works as intended."
 
   #if __has_include(<FirebaseInstanceID/FirebaseInstanceID.h>)
     #import <FirebaseInstanceID/FirebaseInstanceID.h>
+=======
+  #endif
+
+  #if __has_include(<FirebaseInstallations/FirebaseInstallations.h>)
+    #import <FirebaseInstallations/FirebaseInstallations.h>
+>>>>>>> Stashed changes
   #endif
 
   #if __has_include(<FirebaseMessaging/FirebaseMessaging.h>)
     #import <FirebaseMessaging/FirebaseMessaging.h>
+<<<<<<< Updated upstream
       #if !__has_include(<FirebaseAnalytics/FirebaseAnalytics.h>)
       #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
         #warning "FirebaseAnalytics.framework is not included in your target. Please add \
@@ -105,6 +127,8 @@ Firebase Messaging works as intended."
 
   #if __has_include(<FirebaseMLVision/FirebaseMLVision.h>)
     #import <FirebaseMLVision/FirebaseMLVision.h>
+=======
+>>>>>>> Stashed changes
   #endif
 
   #if __has_include(<FirebaseMLVisionAutoML/FirebaseMLVisionAutoML.h>)
@@ -133,6 +157,7 @@ Firebase Messaging works as intended."
 
   #if __has_include(<FirebasePerformance/FirebasePerformance.h>)
     #import <FirebasePerformance/FirebasePerformance.h>
+<<<<<<< Updated upstream
     #if !__has_include(<FirebaseAnalytics/FirebaseAnalytics.h>)
       #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
         #warning "FirebaseAnalytics.framework is not included in your target. Please add \
@@ -140,10 +165,13 @@ Firebase Messaging works as intended."
 Firebase Performance works as intended."
       #endif // #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
     #endif
+=======
+>>>>>>> Stashed changes
   #endif
 
   #if __has_include(<FirebaseRemoteConfig/FirebaseRemoteConfig.h>)
     #import <FirebaseRemoteConfig/FirebaseRemoteConfig.h>
+<<<<<<< Updated upstream
     #if !__has_include(<FirebaseAnalytics/FirebaseAnalytics.h>)
       #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
         #warning "FirebaseAnalytics.framework is not included in your target. Please add \
@@ -151,22 +179,12 @@ Firebase Performance works as intended."
 Firebase Remote Config works as intended."
       #endif // #ifndef FIREBASE_ANALYTICS_SUPPRESS_WARNING
     #endif
+=======
+>>>>>>> Stashed changes
   #endif
 
   #if __has_include(<FirebaseStorage/FirebaseStorage.h>)
     #import <FirebaseStorage/FirebaseStorage.h>
-  #endif
-
-  #if __has_include(<GoogleMobileAds/GoogleMobileAds.h>)
-    #import <GoogleMobileAds/GoogleMobileAds.h>
-  #endif
-
-  #if __has_include(<Fabric/Fabric.h>)
-    #import <Fabric/Fabric.h>
-  #endif
-
-  #if __has_include(<Crashlytics/Crashlytics.h>)
-    #import <Crashlytics/Crashlytics.h>
   #endif
 
 #endif  // defined(__has_include)

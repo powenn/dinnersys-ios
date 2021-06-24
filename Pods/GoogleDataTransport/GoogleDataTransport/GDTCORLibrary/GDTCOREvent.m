@@ -26,6 +26,7 @@
 
 @implementation GDTCOREvent
 
+<<<<<<< Updated upstream
 + (NSNumber *)nextEventID {
   static unsigned long long nextEventID = 0;
   static NSString *counterPath;
@@ -60,6 +61,11 @@
                  error);
   });
   return result;
+=======
++ (NSString *)nextEventID {
+  // Replace special non-alphanumeric characters to avoid potential conflicts with storage logic.
+  return [[NSUUID UUID].UUIDString stringByReplacingOccurrencesOfString:@"-" withString:@""];
+>>>>>>> Stashed changes
 }
 
 - (nullable instancetype)initWithMappingID:(NSString *)mappingID target:(NSInteger)target {

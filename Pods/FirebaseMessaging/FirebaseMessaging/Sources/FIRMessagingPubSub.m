@@ -19,8 +19,11 @@
 #import <FirebaseMessaging/FIRMessaging.h>
 #import <GoogleUtilities/GULSecureCoding.h>
 #import <GoogleUtilities/GULUserDefaults.h>
+<<<<<<< Updated upstream
 
 #import "FirebaseMessaging/Sources/FIRMessagingClient.h"
+=======
+>>>>>>> Stashed changes
 #import "FirebaseMessaging/Sources/FIRMessagingDefines.h"
 #import "FirebaseMessaging/Sources/FIRMessagingLogger.h"
 #import "FirebaseMessaging/Sources/FIRMessagingPendingTopicsList.h"
@@ -28,6 +31,8 @@
 #import "FirebaseMessaging/Sources/FIRMessaging_Private.h"
 #import "FirebaseMessaging/Sources/NSDictionary+FIRMessaging.h"
 #import "FirebaseMessaging/Sources/NSError+FIRMessaging.h"
+#import "FirebaseMessaging/Sources/Public/FirebaseMessaging/FIRMessaging.h"
+#import "FirebaseMessaging/Sources/Token/FIRMessagingTokenManager.h"
 
 static NSString *const kPendingSubscriptionsListKey =
     @"com.firebase.messaging.pending-subscriptions";
@@ -35,12 +40,20 @@ static NSString *const kPendingSubscriptionsListKey =
 @interface FIRMessagingPubSub () <FIRMessagingPendingTopicsListDelegate>
 
 @property(nonatomic, readwrite, strong) FIRMessagingPendingTopicsList *pendingTopicUpdates;
+<<<<<<< Updated upstream
 @property(nonatomic, readwrite, strong) FIRMessagingClient *client;
+=======
+@property(nonatomic, readonly, strong) NSOperationQueue *topicOperations;
+// Common errors, instantiated, to avoid generating multiple copies
+@property(nonatomic, readwrite, strong) NSError *operationInProgressError;
+@property(nonatomic, readwrite, strong) FIRMessagingTokenManager *tokenManager;
+>>>>>>> Stashed changes
 
 @end
 
 @implementation FIRMessagingPubSub
 
+<<<<<<< Updated upstream
 - (instancetype)init {
   FIRMessagingInvalidateInitializer();
   // Need this to disable an Xcode warning.
@@ -51,6 +64,16 @@ static NSString *const kPendingSubscriptionsListKey =
   self = [super init];
   if (self) {
     _client = client;
+=======
+- (instancetype)initWithTokenManager:(FIRMessagingTokenManager *)tokenManager {
+  self = [super init];
+  if (self) {
+    _topicOperations = [[NSOperationQueue alloc] init];
+    // Do 10 topic operations at a time; it's enough to keep the TCP connection to the host alive,
+    // saving hundreds of milliseconds on each request (compared to a serial queue).
+    _topicOperations.maxConcurrentOperationCount = 10;
+    _tokenManager = tokenManager;
+>>>>>>> Stashed changes
     [self restorePendingTopicsList];
   }
   return self;
@@ -93,6 +116,7 @@ static NSString *const kPendingSubscriptionsListKey =
   // copy the dictionary would trim non-string keys or values if any.
   options = [options fcm_trimNonStringValues];
 
+<<<<<<< Updated upstream
   [self.client updateSubscriptionWithToken:token
                                      topic:topic
                                    options:options
@@ -100,6 +124,60 @@ static NSString *const kPendingSubscriptionsListKey =
                                    handler:^void(NSError *error) {
                                      handler(error);
                                    }];
+=======
+  [self updateSubscriptionWithToken:token
+                              topic:topic
+                            options:options
+                       shouldDelete:NO
+                            handler:handler];
+}
+
+- (void)dealloc {
+  [self.topicOperations cancelAllOperations];
+}
+
+#pragma mark - FIRMessaging subscribe
+
+- (void)updateSubscriptionWithToken:(NSString *)token
+                              topic:(NSString *)topic
+                            options:(NSDictionary *)options
+                       shouldDelete:(BOOL)shouldDelete
+                            handler:(FIRMessagingTopicOperationCompletion)handler {
+  if ([_tokenManager hasValidCheckinInfo]) {
+    FIRMessagingTopicAction action =
+        shouldDelete ? FIRMessagingTopicActionUnsubscribe : FIRMessagingTopicActionSubscribe;
+    FIRMessagingTopicOperation *operation = [[FIRMessagingTopicOperation alloc]
+        initWithTopic:topic
+               action:action
+         tokenManager:_tokenManager
+              options:options
+           completion:^(NSError *_Nullable error) {
+             if (error) {
+               FIRMessagingLoggerError(kFIRMessagingMessageCodeClient001,
+                                       @"Failed to subscribe to topic %@", error);
+             } else {
+               if (shouldDelete) {
+                 FIRMessagingLoggerInfo(kFIRMessagingMessageCodeClient002,
+                                        @"Successfully unsubscribed from topic %@", topic);
+               } else {
+                 FIRMessagingLoggerInfo(kFIRMessagingMessageCodeClient003,
+                                        @"Successfully subscribed to topic %@", topic);
+               }
+             }
+             if (handler) {
+               handler(error);
+             }
+           }];
+    [self.topicOperations addOperation:operation];
+  } else {
+    NSString *failureReason = @"Device ID and checkin info is not found. Will not proceed with "
+                              @"subscription/unsubscription.";
+    FIRMessagingLoggerDebug(kFIRMessagingMessageCodeRegistrar000, @"%@", failureReason);
+    NSError *error = [NSError messagingErrorWithCode:kFIRMessagingErrorCodeMissingDeviceID
+                                       failureReason:failureReason];
+    handler(error);
+  }
+>>>>>>> Stashed changes
 }
 
 - (void)unsubscribeWithToken:(NSString *)token
@@ -160,7 +238,7 @@ static NSString *const kPendingSubscriptionsListKey =
 }
 
 - (void)scheduleSync:(BOOL)immediately {
-  NSString *fcmToken = [[FIRMessaging messaging] defaultFcmToken];
+  NSString *fcmToken = _tokenManager.defaultFCMToken;
   if (fcmToken.length) {
     [self.pendingTopicUpdates resumeOperationsIfNeeded];
   }
@@ -172,7 +250,7 @@ static NSString *const kPendingSubscriptionsListKey =
     requestedUpdateForTopic:(NSString *)topic
                      action:(FIRMessagingTopicAction)action
                  completion:(FIRMessagingTopicOperationCompletion)completion {
-  NSString *fcmToken = [[FIRMessaging messaging] defaultFcmToken];
+  NSString *fcmToken = _tokenManager.defaultFCMToken;
   if (action == FIRMessagingTopicActionSubscribe) {
     [self subscribeWithToken:fcmToken topic:topic options:nil handler:completion];
   } else {
@@ -185,7 +263,7 @@ static NSString *const kPendingSubscriptionsListKey =
 }
 
 - (BOOL)pendingTopicsListCanRequestTopicUpdates:(FIRMessagingPendingTopicsList *)list {
-  NSString *fcmToken = [[FIRMessaging messaging] defaultFcmToken];
+  NSString *fcmToken = _tokenManager.defaultFCMToken;
   return (fcmToken.length > 0);
 }
 

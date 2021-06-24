@@ -15,7 +15,11 @@
   <key>CFBundlePackageType</key>
   <string>FMWK</string>
   <key>CFBundleShortVersionString</key>
+<<<<<<< Updated upstream
   <string>5.2.1</string>
+=======
+  <string>5.4.3</string>
+>>>>>>> Stashed changes
   <key>CFBundleSignature</key>
   <string>????</string>
   <key>CFBundleVersion</key>

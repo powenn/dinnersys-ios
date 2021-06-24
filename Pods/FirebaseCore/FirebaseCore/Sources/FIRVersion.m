@@ -29,5 +29,11 @@
 #define STR(x) STR_EXPAND(x)
 #define STR_EXPAND(x) #x
 
+<<<<<<< Updated upstream
 const char *const FIRVersionString = (const char *const)STR(Firebase_VERSION);
 const char *const FIRCoreVersionString = (const char *const)STR(FIRCore_VERSION);
+=======
+NSString* FIRFirebaseVersion(void) {
+  return @STR(Firebase_VERSION);
+}
+>>>>>>> Stashed changes

@@ -20,14 +20,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-#if !NDEBUG
-/** A notification fired when uploading is complete, detailing the number of events uploaded. */
-extern NSNotificationName const GDTCCTUploadCompleteNotification;
-#endif  // #if !NDEBUG
-
 /** Class capable of uploading events to the CCT backend. */
 @interface GDTCCTUploader : NSObject <GDTCORUploader>
 
+<<<<<<< Updated upstream:Pods/GoogleDataTransportCCTSupport/GoogleDataTransportCCTSupport/GDTCCTLibrary/Private/GDTCCTUploader.h
 /** The queue on which all CCT uploading will occur. */
 @property(nonatomic, readonly) dispatch_queue_t uploaderQueue;
 
@@ -45,18 +41,24 @@ extern NSNotificationName const GDTCCTUploadCompleteNotification;
 
 /** The next upload time for the FLL target. */
 @property(nullable, nonatomic) GDTCORClock *FLLNextUploadTime;
-
-#if !NDEBUG
-/** An upload URL used across all targets. For testing only. */
-@property(nullable, nonatomic) NSURL *testServerURL;
-
-#endif  // !NDEBUG
-
+=======
 /** Creates and/or returns the singleton instance of this class.
  *
  * @return The singleton instance of this class.
  */
 + (instancetype)sharedInstance;
+>>>>>>> Stashed changes:Pods/GoogleDataTransport/GoogleDataTransport/GDTCCTLibrary/Private/GDTCCTUploader.h
+
+#if !NDEBUG
+/** An upload URL used across all targets. For testing only. */
+@property(nullable, nonatomic) NSURL *testServerURL;
+
+/** Spins runloop until upload finishes or timeout.
+ *  @return YES if upload finishes, NO in the case of timeout.
+ */
+- (BOOL)waitForUploadFinishedWithTimeout:(NSTimeInterval)timeout;
+
+#endif  // !NDEBUG
 
 @end
 

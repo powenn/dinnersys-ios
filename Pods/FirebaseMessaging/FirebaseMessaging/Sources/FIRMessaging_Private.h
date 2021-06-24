@@ -41,8 +41,11 @@ FOUNDATION_EXPORT NSString *const kFIRMessagingPlistUseMessagingDelegate;
 
 #pragma mark - Private API
 
+<<<<<<< Updated upstream
 - (NSString *)defaultFcmToken;
 - (FIRMessagingClient *)client;
+=======
+>>>>>>> Stashed changes
 - (FIRMessagingPubSub *)pubsub;
 
 // Create a sample message to be sent over the wire using FIRMessaging. Look at
@@ -55,5 +58,6 @@ FOUNDATION_EXPORT NSString *const kFIRMessagingPlistUseMessagingDelegate;
 
 - (BOOL)isNetworkAvailable;
 - (FIRMessagingNetworkStatus)networkType;
++ (NSString *)FIRMessagingSDKVersion;
 
 @end

@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Scheme
+<<<<<<< Updated upstream:Pods/Pods.xcodeproj/xcuserdata/seanpai.xcuserdatad/xcschemes/Crashlytics.xcscheme
    LastUpgradeVersion = "1200"
+=======
+   LastUpgradeVersion = "1250"
+>>>>>>> Stashed changes:Pods/Pods.xcodeproj/xcuserdata/seanpai.xcuserdatad/xcschemes/FirebaseCrashlytics.xcscheme
    version = "1.3">
    <BuildAction
       parallelizeBuildables = "YES"

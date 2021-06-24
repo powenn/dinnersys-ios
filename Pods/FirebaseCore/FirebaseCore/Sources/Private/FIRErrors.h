@@ -18,7 +18,15 @@
 
 #include "FIRErrorCode.h"
 
+<<<<<<< Updated upstream:Pods/FirebaseCore/FirebaseCore/Sources/Private/FIRErrors.h
 extern NSString *const kFirebaseErrorDomain;
 extern NSString *const kFirebaseConfigErrorDomain;
 extern NSString *const kFirebaseCoreErrorDomain;
 extern NSString *const kFirebasePerfErrorDomain;
+=======
+/** Returns the current version of Firebase. */
+NS_SWIFT_NAME(FirebaseVersion())
+NSString* FIRFirebaseVersion(void);
+
+NS_ASSUME_NONNULL_END
+>>>>>>> Stashed changes:Pods/FirebaseCore/FirebaseCore/Sources/Public/FirebaseCore/FIRVersion.h

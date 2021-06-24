@@ -14,7 +14,11 @@
  * limitations under the License.
  */
 
+<<<<<<< Updated upstream
 #import "FIRMMessageCode.h"
+=======
+#import "FirebaseMessaging/Sources/FIRMessagingCode.h"
+>>>>>>> Stashed changes
 
 // The convenience macros are only defined if they haven't already been defined.
 #ifndef FIRMessagingLoggerInfo

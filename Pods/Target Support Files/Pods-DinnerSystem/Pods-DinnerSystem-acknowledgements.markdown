@@ -3,7 +3,7 @@ This application makes use of the following third party libraries:
 
 ## Alamofire
 
-Copyright (c) 2014-2020 Alamofire Software Foundation (http://alamofire.org/)
+Copyright (c) 2014-2021 Alamofire Software Foundation (http://alamofire.org/)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -240,7 +240,7 @@ Fabric: Copyright 2018 Google, Inc. All Rights Reserved. Use of this software is
 
 ## FirebaseAnalytics
 
-Copyright 2020 Google
+Copyright 2021 Google
 
 ## FirebaseCore
 
@@ -1052,6 +1052,7 @@ Copyright 2020 Google
       identification within third-party archives.
 
    Copyright [yyyy] [name of copyright owner]
+<<<<<<< Updated upstream
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1258,6 +1259,8 @@ Copyright 2020 Google
       identification within third-party archives.
 
    Copyright [yyyy] [name of copyright owner]
+=======
+>>>>>>> Stashed changes
 
    Licensed under the Apache License, Version 2.0 (the "License");
    you may not use this file except in compliance with the License.
@@ -1482,7 +1485,15 @@ Copyright 2020 Google
    limitations under the License.
 
 
+<<<<<<< Updated upstream
 ## GoogleDataTransportCCTSupport
+=======
+## GoogleAppMeasurement
+
+Copyright 2021 Google
+
+## GoogleDataTransport
+>>>>>>> Stashed changes
 
 
                                  Apache License

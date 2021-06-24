@@ -36,8 +36,6 @@ extern FIRLoggerService kFIRLoggerAnalytics;
 extern FIRLoggerService kFIRLoggerAuth;
 extern FIRLoggerService kFIRLoggerCrash;
 extern FIRLoggerService kFIRLoggerCore;
-extern FIRLoggerService kFIRLoggerMLKit;
-extern FIRLoggerService kFIRLoggerPerf;
 extern FIRLoggerService kFIRLoggerRemoteConfig;
 
 /**

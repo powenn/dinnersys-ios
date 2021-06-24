@@ -18,8 +18,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+<<<<<<< Updated upstream
 @class FIRMessagingClient;
 @class FIRMessagingPubSubCache;
+=======
+@class FIRMessagingTokenManager;
+>>>>>>> Stashed changes
 
 /**
  *  FIRMessagingPubSub provides a publish-subscribe model for sending FIRMessaging topic messages.
@@ -38,6 +42,7 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @interface FIRMessagingPubSub : NSObject
 
+<<<<<<< Updated upstream
 @property(nonatomic, readonly, strong) FIRMessagingPubSubCache *cache;
 @property(nonatomic, readonly, strong) FIRMessagingClient *client;
 
@@ -47,6 +52,9 @@ NS_ASSUME_NONNULL_BEGIN
  *  @return An instance of FIRMessagingPubSub.
  */
 - (instancetype)initWithClient:(FIRMessagingClient *)client NS_DESIGNATED_INITIALIZER;
+=======
+- (instancetype)initWithTokenManager:(FIRMessagingTokenManager *)tokenManager;
+>>>>>>> Stashed changes
 
 /**
  *  Subscribes an app instance to a topic, enabling it to receive messages

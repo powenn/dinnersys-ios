@@ -14,6 +14,13 @@
  * limitations under the License.
  */
 
+<<<<<<< Updated upstream:Pods/FirebaseInstallations/FirebaseInstallations/Source/Library/Public/FIRInstallationsVersion.h
 #import <Foundation/Foundation.h>
 
 FOUNDATION_EXPORT const char *const FIRInstallationsVersionStr;
+=======
+#import "FIRCrashlytics.h"
+#import "FIRCrashlyticsReport.h"
+#import "FIRExceptionModel.h"
+#import "FIRStackFrame.h"
+>>>>>>> Stashed changes:Pods/FirebaseCrashlytics/Crashlytics/Crashlytics/Public/FirebaseCrashlytics/FirebaseCrashlytics.h

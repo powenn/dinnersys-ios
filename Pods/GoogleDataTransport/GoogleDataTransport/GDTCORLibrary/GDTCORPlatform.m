@@ -150,7 +150,11 @@ GDTCORNetworkMobileSubtype GDTCORNetworkMobileSubTypeMessage() {
   } else {
     return GDTCORNetworkMobileSubtypeUNKNOWN;
   }
+<<<<<<< Updated upstream
 #else
+=======
+#else   // TARGET_OS_IOS
+>>>>>>> Stashed changes
   return GDTCORNetworkMobileSubtypeUNKNOWN;
 #endif
 }
@@ -203,8 +207,15 @@ NSData *_Nullable GDTCOREncodeArchive(id<NSSecureCoding> obj,
                                    code:-1
                                userInfo:@{NSLocalizedFailureReasonErrorKey : errorString}];
     }
+<<<<<<< Updated upstream
     GDTCORLogDebug(@"Attempt to write archive. successful:%@ URL:%@ error:%@",
                    result ? @"YES" : @"NO", archivePath, *error);
+=======
+    if (filePath.length > 0) {
+      GDTCORLogDebug(@"Attempt to write archive. successful:%@ URL:%@ error:%@",
+                     result ? @"YES" : @"NO", filePath, *error);
+    }
+>>>>>>> Stashed changes
   }
   return resultData;
 }
